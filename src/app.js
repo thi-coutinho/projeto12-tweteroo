@@ -1,6 +1,5 @@
 import express from 'express'
 import cors from 'cors'
-import { t } from 'tar'
 
 const app = express()
 app.use(cors())

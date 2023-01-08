@@ -10,10 +10,10 @@ const tweets = []
 
 
 app.get("/tweets", (req, res) => {
-    while (tweets.length > 10) {
-        tweets.shift()
-    }
-    const tweetsAndAvatars = tweets.map(t => {
+    const size = tweets.length
+    const limit = 10
+    let tweetsAndAvatars=size>limit?tweets.slice(size-limit,size):[...tweets]
+    tweetsAndAvatars = tweetsAndAvatars.map(t => {
         const avatar = users.find(u=>t.username===u.username).avatar
         return { ...t, avatar }
     })
@@ -30,9 +30,9 @@ app.post("/tweets", (req, res) => {
     const username = req.body.username
     if (users.find(u => u.username === username)) {
         tweets.push(req.body)
-        res.send("OK")
+        res.status(201).send("OK")
     } else {
-        res.send("UNAUTHORIZED")
+        res.status(401).send("UNAUTHORIZED")
     }
 })
 

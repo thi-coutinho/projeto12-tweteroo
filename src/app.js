@@ -9,7 +9,7 @@ app.use(express.json())
 // const tweets = []
 import {users,tweets} from '../mock.js'
 
-function getTweets(list = tweets,username=false){
+function getAvatars(list = tweets,username=false){
     let outList
     if (!username) {
         outList = list.map(t => {
@@ -26,10 +26,14 @@ function getTweets(list = tweets,username=false){
 
 }
 app.get("/tweets", (req, res) => {
+    const page = req.query.page? Number(req.query.page): 1
+    if (!(page>=1)) return res.status(400).send("Informe uma página válida!") 
     const size = tweets.length
     const limit = 10
-    let tweetsAndAvatars=size>limit?tweets.slice(size-limit,size):[...tweets]
-    tweetsAndAvatars = getTweets(tweetsAndAvatars)
+    const end = size - (page-1)*limit > 0 ? size - (page-1)*limit : 0
+    const start = end > limit? end-limit: 0
+    let tweetsAndAvatars=size>limit?tweets.slice(start,end):[...tweets]
+    tweetsAndAvatars = getAvatars(tweetsAndAvatars)
     res.send(tweetsAndAvatars)
 })
 
@@ -55,7 +59,7 @@ app.post("/tweets", (req, res) => {
 app.get("/tweets/:USERNAME",(req,res)=>{
     const username = req.params.USERNAME
     if (users.find(u => u.username === username)) {
-        const tweetsByUser = getTweets(tweets,username)
+        const tweetsByUser = getAvatars(tweets,username)
         res.send(tweetsByUser)
     } else {
         res.sendStatus(400)

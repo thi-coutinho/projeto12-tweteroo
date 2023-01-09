@@ -39,14 +39,17 @@ app.get("/tweets", (req, res) => {
 
 app.post("/sign-up", (req, res) => {
     const data = req.body
-    if (!data.username || !data.avatar) return res.status(400).send("Todos os campos são obrigatórios")
+    if (!data.username || !data.avatar ||  typeof data.username !== 'string' || typeof data.avatar!=='string' ){
+        return res.status(400).send("Todos os campos são obrigatórios!")
+    }
+
     users.push(data)
     res.status(201).send("OK")
 })
 
 app.post("/tweets", (req, res) => {
     const data = {username:req.headers.user,tweet:req.body.tweet}
-    if (!data.username || !data.tweet) return res.status(400).send("Todos os campos são obrigatórios")
+    if (!data.username || !data.tweet) return res.status(400).send("Todos os campos são obrigatórios!")
     const username = data.username
     if (users.find(u => u.username === username)) {
         tweets.push(data)

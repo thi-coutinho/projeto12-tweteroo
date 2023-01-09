@@ -5,9 +5,9 @@ const app = express()
 app.use(cors())
 app.use(express.json())
 
-// const users = []
-// const tweets = []
-import {users,tweets} from '../mock.js'
+const users = []
+const tweets = []
+// import {users,tweets} from '../mock.js'
 
 function getAvatars(list = tweets,username=false){
     let outList
@@ -32,9 +32,9 @@ app.get("/tweets", (req, res) => {
     const limit = 10
     const end = size - (page-1)*limit > 0 ? size - (page-1)*limit : 0
     const start = end > limit? end-limit: 0
-    let tweetsAndAvatars=size>limit?tweets.slice(start,end):[...tweets]
+    let tweetsAndAvatars=size>limit || page > 1 ? tweets.slice(start,end):[...tweets]
     tweetsAndAvatars = getAvatars(tweetsAndAvatars)
-    res.send(tweetsAndAvatars)
+    res.send(tweetsAndAvatars.reverse())
 })
 
 app.post("/sign-up", (req, res) => {
@@ -45,11 +45,11 @@ app.post("/sign-up", (req, res) => {
 })
 
 app.post("/tweets", (req, res) => {
-    const data = req.body
+    const data = {username:req.headers.user,tweet:req.body.tweet}
     if (!data.username || !data.tweet) return res.status(400).send("Todos os campos são obrigatórios")
     const username = data.username
     if (users.find(u => u.username === username)) {
-        tweets.push(req.body)
+        tweets.push(data)
         res.status(201).send("OK")
     } else {
         res.status(401).send("UNAUTHORIZED")
